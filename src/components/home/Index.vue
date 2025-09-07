@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Watch now</p>
+    <p>Watchss now</p>
     <p class="text-sm">Top picks for you. Updated Daily</p>
 
     <div class="mt-3" v-if="genre">

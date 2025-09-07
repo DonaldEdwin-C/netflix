@@ -1,52 +1,87 @@
 <template>
   <div>
-    <p>{{ genreName }}</p>
-    <p class="text-sm">Top picks for you.</p>
+    <h2 class="text-2xl font-bold py-4">
+      {{ title }}
+    </h2>
 
-    <div class="mt-3" v-if="genre">
-      <!-- Genre-specific movies -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 min-h-[30rem] gap-x-4 gap-y-8">
-        <div v-for="movie in movies" :key="movie.id" class="bg-white rounded shadow">
-          <img :src="movie.poster" alt="" class="h-full object-cover" />
-          <h2 class="font-semibold">{{ movie.title }}</h2>
+    <div v-if="loading" class="loading">
+      Loading movies...
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div v-for="movie in movies" :key="movie.id">
+        <img
+          v-if="movie.poster_path"
+          :src="`https://image.tmdb.org/t/p/w300${movie.poster_path}`"
+          :alt="movie.title || movie.name"
+        />
+        <div class="py-2">
+          <h3>{{ movie.title || movie.name }}</h3>
+          <p class="text-sm">
+            {{ movie.release_date || movie.first_air_date }}
+          </p>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { watch, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, watchEffect, computed } from 'vue'
+import { useStore } from 'vuex'
 
-const route = useRoute()
-const genre = ref(null)
+const genreIdMap = {
+  action: 28,
+  adventure: 12,
+  animation: 16,
+  comedy: 35,
+  crime: 80,
+  documentary: 99,
+  drama: 18,
+  family: 10751,
+  fantasy: 14,
+  history: 36,
+  horror: 27,
+  music: 10402,
+  mystery: 9648,
+}
+
+// props are optional now
+const props = defineProps({
+  type: { type: String, required: false },
+  genre: { type: String, required: false },
+})
+
+const store = useStore()
 const movies = ref([])
-const genreName = ref(route.params.name)
+const loading = ref(false)
 
-watch(
-  () => route.params.name,
-  (newGenre) => {
-    genreName.value = newGenre
-  },
-)
+// dynamic page title
+const title = computed(() => {
+  if (!props.type || !props.genre) return 'Trending Today'
+  return `${props.genre.charAt(0).toUpperCase() + props.genre.slice(1)} ${
+    props.type.charAt(0).toUpperCase() + props.type.slice(1)
+  }`
+})
 
 watchEffect(async () => {
-  genre.value = route.params.genre || null
-
-  if (genre.value) {
-    // Mock fetch (replace with API call)
-    movies.value = [
-      { id: 1, title: 'Fast & Furious', poster: '/img/movie1.jpg' },
-      { id: 2, title: 'Die Hard', poster: '/img/movie1.jpg' },
-      { id: 2, title: 'Die Hard', poster: '/img/movie1.jpg' },
-      { id: 2, title: 'Die Hard', poster: '/img/movie1.jpg' },
-      { id: 2, title: 'Die Hard', poster: '/img/movie1.jpg' },
-      { id: 2, title: 'Die Hard', poster: '/img/movie1.jpg' },
-    ]
-  } else {
-    movies.value = []
+  loading.value = true
+  try {
+    if (!props.type || !props.genre) {
+      // Trending
+      await store.dispatch('movies/fetchTrending')
+      movies.value = store.getters['movies/allMovies']
+    } else if (props.type === 'movies') {
+      await store.dispatch('movies/fetchMoviesByGenre', genreIdMap[props.genre])
+      movies.value = store.getters['movies/allMovies']
+    } else if (props.type === 'series') {
+      await store.dispatch('movies/fetchSeriesByGenre', genreIdMap[props.genre])
+      movies.value = store.getters['movies/allMovies']
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loading.value = false
   }
 })
 </script>

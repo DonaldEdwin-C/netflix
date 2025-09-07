@@ -1,5 +1,5 @@
 <script setup>
-import { GalleryVerticalEnd } from 'lucide-vue-next'
+import { ref } from 'vue'
 import {
   Sidebar,
   SidebarContent,
@@ -21,121 +21,24 @@ const props = defineProps({
   class: { type: null, required: false },
 })
 
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: 'Browse',
-      url: '/dashboard/genre',
-      items: [
-        {
-          title: 'Movies',
-          url: '/dashboard/movies',
-        },
-        {
-          title: 'Series',
-          url: '/dashboard/series',
-        },
-      ],
-    },
-    {
-      title: 'Genre',
-      url: 'Genre',
-      items: [
-        {
-          title: 'Action',
-          url: '/dashboard/genre/action',
-        },
-        {
-          title: 'Adventure',
-          url: '/dashboard/genre/adventure',
-          isActive: true,
-        },
-        {
-          title: 'Animation',
-          url: '/dashboard/genre/animation',
-        },
-        {
-          title: 'Comedy',
-          url: '/dashboard/genre/comedy',
-        },
-        {
-          title: 'Crime',
-          url: '/dashboard/genre/crime',
-        },
-        {
-          title: 'Documentary',
-          url: '/dashboard/genre/documentary',
-        },
-        {
-          title: 'Drama',
-          url: '/dashboard/genre/drama',
-        },
-        {
-          title: 'Family',
-          url: '/dashboard/genre/family',
-        },
-        {
-          title: 'Fantasy',
-          url: '/dashboard/genre/fantasy',
-        },
-        {
-          title: 'History',
-          url: '/dashboard/genre/history',
-        },
-        {
-          title: 'Horror',
-          url: '/dashboard/genre/horror',
-        },
-        {
-          title: 'Music',
-          url: '/dashboard/genre/music',
-        },
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre/mystery',
-        },
-      ],
-    },
-    {
-      title: 'My Watchlist',
-      url: '/dashboard/genre',
-      items: [
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre',
-        },
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre',
-        },
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre',
-        },
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre',
-        },
-        {
-          title: 'Mystery',
-          url: '/dashboard/genre',
-        },
-      ],
-    },
+const activeType = ref('movies') // default type
 
-    {
-      title: 'Community',
-      url: '/dashboard/genre',
-      items: [
-        {
-          title: 'Contribution Guide',
-          url: '/dashboard/genre',
-        },
-      ],
-    },
-  ],
-}
+// Hardcoded genres
+const genres = [
+  'Action',
+  'Adventure',
+  'Animation',
+  'Comedy',
+  'Crime',
+  'Documentary',
+  'Drama',
+  'Family',
+  'Fantasy',
+  'History',
+  'Horror',
+  'Music',
+  'Mystery',
+]
 </script>
 
 <template>
@@ -145,14 +48,10 @@ const data = {
       <SidebarMenuItem>
         <SidebarMenuButton size="lg" as-child>
           <router-link to="/dashboard">
-            <div
-              class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
-            >
-              <GalleryVerticalEnd class="size-4" />
+            <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              N
             </div>
-            <div class="flex flex-col gap-0.5 leading-none">
-              Netflix
-            </div>
+            <div class="flex flex-col gap-0.5 leading-none">Netflix</div>
           </router-link>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -162,17 +61,41 @@ const data = {
   <SidebarContent>
     <SidebarGroup>
       <SidebarMenu>
-        <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
+        <!-- Movies / Series -->
+        <SidebarMenuItem>
           <SidebarMenuButton as-child>
-            <router-link :to="item.url" class="font-medium">
-              {{ item.title }}
+            <router-link
+              to="/dashboard/movies"
+              class="font-medium"
+              @click.native="activeType = 'movies'"
+            >
+              Movies
             </router-link>
           </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton as-child>
+            <router-link
+              to="/dashboard/series"
+              class="font-medium"
+              @click.native="activeType = 'series'"
+            >
+              Series
+            </router-link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
 
-          <SidebarMenuSub v-if="item.items.length">
-            <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
-              <SidebarMenuSubButton as-child :is-active="childItem.isActive">
-                <router-link :to="childItem.url">{{ childItem.title }}</router-link>
+        <!-- Hardcoded genres -->
+        <SidebarMenuItem>
+          <SidebarMenuButton>
+            Genres
+          </SidebarMenuButton>
+          <SidebarMenuSub>
+            <SidebarMenuSubItem v-for="genre in genres" :key="genre">
+              <SidebarMenuSubButton as-child>
+                <router-link :to="`/dashboard/${activeType}/genre/${genre.toLowerCase()}`">
+                  {{ genre }}
+                </router-link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
           </SidebarMenuSub>
@@ -183,5 +106,4 @@ const data = {
 
   <SidebarRail />
 </Sidebar>
-
 </template>

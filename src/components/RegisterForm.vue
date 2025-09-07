@@ -4,6 +4,26 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
+const email = ref('')
+const password = ref('')
+
+const store = useStore()
+const router = useRouter()
+
+const registerUser = async () => {
+  try {
+    await store.dispatch('auth/register', { email: email.value, password: password.value })
+    alert('Registered succeddfully! Please login.')
+    router.push('/login')
+  } catch (err) {
+    console.error('Registrstion error:', err)
+    alert('Registration failed')
+  }
+}
 
 const props = defineProps({
   class: { type: null, required: false },
@@ -22,7 +42,7 @@ const props = defineProps({
           <div class="flex flex-col gap-6">
             <div class="grid gap-3">
               <Label for="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input v-model="email" id="email" type="email" placeholder="m@example.com" required />
             </div>
             <div class="grid gap-3">
               <div class="flex items-center">
@@ -31,10 +51,10 @@ const props = defineProps({
                   Forgot your password?
                 </a>
               </div>
-              <Input id="password" type="password" required />
+              <Input v-model="password" id="password" type="password" required />
             </div>
             <div class="flex flex-col gap-3">
-              <Button type="submit" class="w-full"> Register </Button>
+              <Button @click.prevent="registerUser" type="submit" class="w-full"> Register </Button>
             </div>
           </div>
           <div class="mt-4 text-center text-sm">
