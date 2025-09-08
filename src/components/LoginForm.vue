@@ -42,14 +42,12 @@ const props = defineProps({
           <div class="flex flex-col gap-6">
             <div class="grid gap-3">
               <Label for="email">Email</Label>
-              <Input v-model="email" id="email" type="email" placeholder="m@example.com" required />
+              <Input v-model="email" id="email" type="email" placeholder="" required />
             </div>
             <div class="grid gap-3">
               <div class="flex items-center">
                 <Label for="password">Password</Label>
-                <a href="#" class="ml-auto inline-block text-sm underline-offset-4 hover:underline">
-                  Forgot your password?
-                </a>
+
               </div>
               <Input v-model="password" id="password" type="password" required />
             </div>

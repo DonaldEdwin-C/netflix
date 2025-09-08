@@ -55,6 +55,12 @@ export default {
         console.error('Error fetching genres:', err)
       }
     },
+    async search({ commit }, query) {
+      const res = await tmdbApi.get('/search/multi', {
+        params: { query }
+      })
+      commit('setMovies', res.data.results)
+    }
   },
   getters: {
     allMovies: (state) => state.allMovies,

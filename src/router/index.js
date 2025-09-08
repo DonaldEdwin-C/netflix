@@ -1,13 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import IndexView from '../views/dashboard/IndexView.vue'
-import MoviesView from '@/views/dashboard/GenreView.vue'
-import SeriesView from '@/views/dashboard/SeriesView.vue'
 import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
-import AdminView from '@/views/admin/AdminView.vue'
 import GenreView from '@/views/dashboard/GenreView.vue'
 import WatchlistView from '@/views/dashboard/WatchlistView.vue'
-import Category from '@/components/home/Category.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,7 +25,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      meta: { layout: 'DashboardLayout' },
+      meta: { layout: 'DashboardLayout', requiresAuth: true },
       children: [
         {
           path: '',
@@ -49,17 +45,37 @@ const router = createRouter({
       path: '/home/watchlist',
       name: 'watchlist',
       component: WatchlistView,
-      meta: { layout: 'DashboardLayout' },
+      meta: { layout: 'DashboardLayout', requiresAuth: true },
     },
 
-    //admin
     {
-      path: '/admin',
-      name: 'admin',
-      component: AdminView,
-      meta: { layout: 'AdminLayout' },
+      path: '/dashboard/search',
+      name: 'search',
+      component: GenreView,
+      props: (route) => ({ searchQuery: route.query.q }),
     },
+
+    // //admin
+    // {
+    //   path: '/admin',
+    //   name: 'admin',
+    //   component: AdminView,
+    //   meta: { layout: 'AdminLayout' },
+    // },
   ],
 })
 
+import store from '@/main'
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = store.getters['auth/isAuthenticated']
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next({ name: 'login' })
+  } else if ((to.name === 'login' || to.name === 'register') && isAuthenticated) {
+    next({ name: 'dashboard.index' })
+  } else {
+    next()
+  }
+})
 export default router

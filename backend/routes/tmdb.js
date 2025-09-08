@@ -61,4 +61,50 @@ router.get('/genres', async (req, res) => {
   }
 });
 
+router.get('/movie/:id/videos', async (req, res) => {
+  try {
+    const { id } = req.params
+    const response = await axios.get(`${TMDB_BASE}/movie/${id}/videos`, {
+      params: { api_key: TMDB_KEY },
+    })
+    res.json(response.data)
+  } catch (err) {
+    console.error('Error fetching movie videos:', err.message)
+    res.status(500).json({ error: 'Failed to fetch movie videos' })
+  }
+})
+
+router.get('/tv/:id/videos', async (req, res) => {
+  try {
+    const { id } = req.params
+    const response = await axios.get(`${TMDB_BASE}/tv/${id}/videos`, {
+      params: { api_key: TMDB_KEY },
+    })
+    res.json(response.data)
+  } catch (err) {
+    console.error('Error fetching tv videos:', err.message)
+    res.status(500).json({ error: 'Failed to fetch tv videos' })
+  }
+})
+
+router.get('/search/:type', async (req, res) => {
+  const { type } = req.params       // "multi", "movie", or "tv"
+  const { query } = req.query       // search term
+
+  if (!query) return res.status(400).json({ error: 'Query required' })
+
+  try {
+    const response = await axios.get(`${TMDB_BASE}/search/${type}`, {
+      params: {
+        api_key: TMDB_KEY,
+        query,
+      },
+    })
+    res.json(response.data)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Error fetching search results' })
+  }
+})
+
 module.exports = router;

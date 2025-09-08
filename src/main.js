@@ -20,4 +20,6 @@ const app = createApp(App)
 app.use(store)
 app.use(router)
 
+export default store
+
 app.mount('#app')

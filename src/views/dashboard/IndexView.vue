@@ -4,7 +4,6 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 
-// Create a computed property for cleaner template access
 const movies = computed(() => store.getters['movies/allMovies'])
 
 // Load default trending movies and genres
@@ -38,6 +37,5 @@ onMounted(async () => {
 
   </div>
 </div>
-s
   </div>
 </template>
